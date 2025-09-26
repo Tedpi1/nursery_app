@@ -20,120 +20,149 @@ class CropDetailPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("${crop.crop} Details"),
+        title: Text("${crop.crop} DETAILS"),
         backgroundColor: Colors.green,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              /// 🔹 Scrollable Table
-              SingleChildScrollView(
+    body: _cropDetail(context, crop, deficit, chartData),
+    );
+  }
+}
+Widget _cropDetail(
+    BuildContext context,
+    CropData crop,
+    int deficit,
+    List<PieData> chartData,
+    ) {
+  final bool isSmallScreen = MediaQuery.of(context).size.width < 700;
+
+  return SingleChildScrollView(
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+
+      child: Column(
+        children: [
+          /// 🔹 Scrollable Table
+
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final double colWidth = constraints.maxWidth / 10; // 10 columns here
+
+              return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
+                  columnSpacing: 8,
+                  dataRowMinHeight: 56,
+                  dataRowMaxHeight: 64,
+
+                  // 👇 Header row style
                   headingRowColor: MaterialStateProperty.all(Colors.black87),
-                  headingTextStyle: const TextStyle(color: Colors.white),
-                  columns: const [
-                    DataColumn(label: Text("Batch ID")),
-                    DataColumn(label: Text("Partitions")),
-                    DataColumn(label: Text("Crop")),
-                    DataColumn(label: Text("Sowing Date")),
-                    DataColumn(label: Text("Planting Date")),
-                    DataColumn(label: Text("Seeds Req.")),
-                    DataColumn(label: Text("Achieved")),
-                    DataColumn(label: Text("Deficit")),
-                    DataColumn(label: Text("Status")),
-                    DataColumn(label: Text("#")), // 🔹 new column
+                  headingTextStyle: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 7, // 👈 column titles font size
+                    fontWeight: FontWeight.bold,
+                  ),
+
+                  // 👇 Data row style
+                  dataTextStyle: const TextStyle(
+                    fontSize: 6, // 👈 values font size
+                    color: Colors.black87,
+                  ),
+
+                  columns: [
+                    DataColumn(label: SizedBox(width: colWidth, child: Text("BatchID"))),
+                    DataColumn(label: SizedBox(width: colWidth, child: Text("Partitions"))),
+                    DataColumn(label: SizedBox(width: colWidth, child: Text("SowingDate"))),
+                    DataColumn(label: SizedBox(width: colWidth, child: Text("PlantingDate"))),
+                    DataColumn(label: SizedBox(width: colWidth, child: Text("SeedsReq."))),
+                    DataColumn(label: SizedBox(width: colWidth, child: Text("Achieved"))),
+                    DataColumn(label: SizedBox(width: colWidth, child: Text("Deficit"))),
+                    DataColumn(label: SizedBox(width: colWidth, child: Text("Status"))),
+                    DataColumn(label: SizedBox(width: colWidth, child: Text("#"))),
                   ],
+
                   rows: [
                     DataRow(
                       cells: [
-                        const DataCell(Text("0")), // Example Batch ID
-                        DataCell(Text(crop.partitions)),
+                        DataCell(SizedBox(width: colWidth, child: Text("0"))),
+                        DataCell(SizedBox(width: colWidth, child: Text(crop.partitions))),
+                        DataCell(SizedBox(width: colWidth, child: Text(crop.sowingDate))),
+                        DataCell(SizedBox(width: colWidth, child: Text(crop.plantingDate))),
+                        DataCell(SizedBox(width: colWidth, child: Text(crop.seedsRequired.toString()))),
+                        DataCell(SizedBox(width: colWidth, child: Text(crop.achieved.toString()))),
+                        DataCell(SizedBox(width: colWidth, child: Text(deficit.toString()))),
                         DataCell(
-                          Chip(
-                            label: Text(crop.crop),
-                            backgroundColor: Colors.green,
-                            labelStyle: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        DataCell(Text(crop.sowingDate)),
-                        DataCell(Text(crop.plantingDate)),
-                        DataCell(Text(crop.seedsRequired.toString())),
-                        DataCell(Text(crop.achieved.toString())),
-                        DataCell(Text(deficit.toString())),
-                        DataCell(
-                          Chip(
-                            label: Text(crop.status),
-                            backgroundColor:
-                                crop.status == "Completed"
+                          SizedBox(
+                            width: colWidth,
+                            child: Text(
+                              crop.status,
+                              style: TextStyle(
+                                fontSize: 6,
+                                fontWeight: FontWeight.w600,
+                                color: crop.status == "Completed"
                                     ? Colors.green
                                     : (crop.status == "Pending"
-                                        ? Colors.orange
-                                        : Colors.blue),
-                            labelStyle: const TextStyle(color: Colors.white),
+                                    ? Colors.orange
+                                    : Colors.blue),
+                              ),
+                            ),
                           ),
                         ),
-                        // 🔹 Action button inside #
+
                         DataCell(
                           ElevatedButton(
                             onPressed: () {
+                              final screenSize = MediaQuery.of(context).size;
                               showDialog(
                                 context: context,
-                                builder:
-                                    (context) => Dialog(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                            0.8,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                            0.7,
-                                        child: NurseryBatchDialog(crop: crop),
-                                      ),
-                                    ),
+                                builder: (BuildContext dialogContext) => Dialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: SizedBox(
+                                    width: screenSize.width * 0.2,
+                                    height: screenSize.height * 0.2,
+                                    child: NurseryBatchDialog(crop: crop),
+                                  ),
+                                ),
                               );
                             },
-                            child: const Text("Open"),
+                            child: const Text("Open", style: TextStyle(fontSize: 9)), // 👈 button text small
                           ),
                         ),
                       ],
                     ),
                   ],
                 ),
-              ),
-
-              const SizedBox(height: 24),
-
-              /// 🔹 Progress Pie Chart
-              SizedBox(
-                height: 300,
-                child: SfCircularChart(
-                  title: ChartTitle(text: "Progress Overview"),
-                  legend: const Legend(isVisible: true),
-                  series: <CircularSeries>[
-                    PieSeries<PieData, String>(
-                      dataSource: chartData,
-                      xValueMapper: (PieData data, _) => data.category,
-                      yValueMapper: (PieData data, _) => data.value,
-                      pointColorMapper: (PieData data, _) => data.color,
-                      dataLabelSettings: const DataLabelSettings(
-                        isVisible: true,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              );
+            },
           ),
-        ),
+
+
+
+          const SizedBox(height: 24),
+
+          /// 🔹 Progress Pie Chart
+          SizedBox(
+            height: 300,
+            child: SfCircularChart(
+              title: ChartTitle(text: "Progress Overview"),
+              legend: const Legend(isVisible: true),
+              series: <CircularSeries>[
+                PieSeries<PieData, String>(
+                  dataSource: chartData,
+                  animationDuration: 0, // 👈 FIX: prevent disposed animation bug
+                  xValueMapper: (PieData data, _) => data.category,
+                  yValueMapper: (PieData data, _) => data.value,
+                  pointColorMapper: (PieData data, _) => data.color,
+                  dataLabelSettings: const DataLabelSettings(isVisible: true),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
 }
 
 /// 🔹 Helper Data Model for Pie Chart
