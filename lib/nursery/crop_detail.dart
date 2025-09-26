@@ -33,38 +33,50 @@ Widget _cropDetail(
     int deficit,
     List<PieData> chartData,
     ) {
-  final bool isSmallScreen = MediaQuery.of(context).size.width < 700;
+  final double screenWidth = MediaQuery.of(context).size.width;
+
+  // 🔹 scale font size dynamically
+  double headingFontSize;
+  double dataFontSize;
+  if (screenWidth < 400) {
+    headingFontSize = 8;
+    dataFontSize = 7;
+  } else if (screenWidth < 700) {
+    headingFontSize = 10;
+    dataFontSize = 9;
+  } else {
+    headingFontSize = 12;
+    dataFontSize = 11;
+  }
 
   return SingleChildScrollView(
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
-
       child: Column(
         children: [
           /// 🔹 Scrollable Table
-
           LayoutBuilder(
             builder: (context, constraints) {
-              final double colWidth = constraints.maxWidth / 10; // 10 columns here
+              final double colWidth = constraints.maxWidth / 10;
 
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
                   columnSpacing: 8,
-                  dataRowMinHeight: 56,
+                  dataRowMinHeight: 48,
                   dataRowMaxHeight: 64,
 
                   // 👇 Header row style
                   headingRowColor: MaterialStateProperty.all(Colors.black87),
-                  headingTextStyle: const TextStyle(
+                  headingTextStyle: TextStyle(
                     color: Colors.white,
-                    fontSize: 7, // 👈 column titles font size
+                    fontSize: headingFontSize, // responsive header
                     fontWeight: FontWeight.bold,
                   ),
 
                   // 👇 Data row style
-                  dataTextStyle: const TextStyle(
-                    fontSize: 6, // 👈 values font size
+                  dataTextStyle: TextStyle(
+                    fontSize: dataFontSize, // responsive values
                     color: Colors.black87,
                   ),
 
@@ -96,7 +108,7 @@ Widget _cropDetail(
                             child: Text(
                               crop.status,
                               style: TextStyle(
-                                fontSize: 6,
+                                fontSize: dataFontSize,
                                 fontWeight: FontWeight.w600,
                                 color: crop.status == "Completed"
                                     ? Colors.green
@@ -107,7 +119,6 @@ Widget _cropDetail(
                             ),
                           ),
                         ),
-
                         DataCell(
                           ElevatedButton(
                             onPressed: () {
@@ -126,7 +137,7 @@ Widget _cropDetail(
                                 ),
                               );
                             },
-                            child: const Text("Open", style: TextStyle(fontSize: 9)), // 👈 button text small
+                            child: Text("Open", style: TextStyle(fontSize: dataFontSize)),
                           ),
                         ),
                       ],
@@ -136,8 +147,6 @@ Widget _cropDetail(
               );
             },
           ),
-
-
 
           const SizedBox(height: 24),
 
@@ -150,7 +159,7 @@ Widget _cropDetail(
               series: <CircularSeries>[
                 PieSeries<PieData, String>(
                   dataSource: chartData,
-                  animationDuration: 0, // 👈 FIX: prevent disposed animation bug
+                  animationDuration: 0,
                   xValueMapper: (PieData data, _) => data.category,
                   yValueMapper: (PieData data, _) => data.value,
                   pointColorMapper: (PieData data, _) => data.color,
@@ -164,6 +173,7 @@ Widget _cropDetail(
     ),
   );
 }
+
 
 /// 🔹 Helper Data Model for Pie Chart
 class PieData {

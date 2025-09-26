@@ -12,7 +12,7 @@ class NurseryDashboard extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          "🌱 Nursery Crop Batchs & Summary (Wk 39)",
+          "🌱 Nursery Crop Batches & Summary (Wk 39)",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
@@ -29,11 +29,15 @@ class NurseryDashboard extends StatelessWidget {
   }
 }
 Widget _dashboardSection(BuildContext context) {
+  final double screenWidth = MediaQuery.of(context).size.width;
+
+  // Allow wider width on desktop but keep constrained on mobile
+  final double maxWidth = screenWidth > 1000 ? 1000 : screenWidth;
   return SingleChildScrollView(
     child: Padding(
       padding: const EdgeInsets.all(16.0),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 700),
+        constraints:  BoxConstraints(maxWidth: maxWidth),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -114,47 +118,81 @@ Widget _dashboardSection(BuildContext context) {
 }
 
 Widget _dashboardTable(BuildContext context) {
-  return SingleChildScrollView(
-    scrollDirection: Axis.horizontal, // 👈 allows scroll if too wide
-    child: DataTable(
-      headingRowColor: MaterialStateProperty.all(Colors.black87),
-      headingTextStyle: const TextStyle(color: Colors.white),
-      columnSpacing: 16,
-      columns: const [
-        DataColumn(label: Text("Crop")),
-        DataColumn(label: Text("Seeds Req.")),
-        DataColumn(label: Text("Achieved")),
-        DataColumn(label: Text("Partition")),
-        DataColumn(label: Text("Sowing Date")),
-        DataColumn(label: Text("Planting Date")),
-        DataColumn(label: Text("Status")),
-      ],
-      rows: _crops.map((crop) {
-        return DataRow(
-          cells: [
-            DataCell(Text(crop.crop)),
-            DataCell(Text(crop.seedsRequired.toString())),
-            DataCell(Text(crop.achieved.toString())),
-            DataCell(Text(crop.partitions)),
-            DataCell(Text(crop.sowingDate)),
-            DataCell(Text(crop.plantingDate)),
-            DataCell(
-              Chip(
-                label: Text(crop.status),
-                backgroundColor: crop.status == "Completed"
-                    ? Colors.green
-                    : (crop.status == "Pending"
-                    ? Colors.orange
-                    : Colors.blue),
-                labelStyle: const TextStyle(color: Colors.white),
-              ),
-            ),
+  // 👇 Responsive font sizes
+  final screenWidth = MediaQuery.of(context).size.width;
+  final double headingFontSize = screenWidth < 1000 ? 10 : 12;
+  final double dataFontSize = screenWidth < 600 ? 8 : 10;
+
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final double colWidth = constraints.maxWidth / 7; // 7 columns in your case
+
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          columnSpacing: 8,
+          dataRowMinHeight: 48,
+          dataRowMaxHeight: 64,
+
+          // 👇 Header row style
+          headingRowColor: MaterialStateProperty.all(Colors.black87),
+          headingTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: headingFontSize,
+            fontWeight: FontWeight.bold,
+          ),
+
+          // 👇 Data row style
+          dataTextStyle: TextStyle(
+            fontSize: dataFontSize,
+            color: Colors.black87,
+          ),
+
+          columns: [
+            DataColumn(label: SizedBox(width: colWidth, child: Text("Crop"))),
+            DataColumn(label: SizedBox(width: colWidth, child: Text("Seeds Req."))),
+            DataColumn(label: SizedBox(width: colWidth, child: Text("Achieved"))),
+            DataColumn(label: SizedBox(width: colWidth, child: Text("Partition"))),
+            DataColumn(label: SizedBox(width: colWidth, child: Text("Sowing Date"))),
+            DataColumn(label: SizedBox(width: colWidth, child: Text("Planting Date"))),
+            DataColumn(label: SizedBox(width: colWidth, child: Text("Status"))),
           ],
-        );
-      }).toList(),
-    ),
+
+          rows: _crops.map((crop) {
+            return DataRow(
+              cells: [
+                DataCell(SizedBox(width: colWidth, child: Text(crop.crop))),
+                DataCell(SizedBox(width: colWidth, child: Text(crop.seedsRequired.toString()))),
+                DataCell(SizedBox(width: colWidth, child: Text(crop.achieved.toString()))),
+                DataCell(SizedBox(width: colWidth, child: Text(crop.partitions))),
+                DataCell(SizedBox(width: colWidth, child: Text(crop.sowingDate))),
+                DataCell(SizedBox(width: colWidth, child: Text(crop.plantingDate))),
+                DataCell(
+                  SizedBox(
+                    width: colWidth,
+                    child: Text(
+                      crop.status,
+                      style: TextStyle(
+                        fontSize: dataFontSize,
+                        fontWeight: FontWeight.w600,
+                        color: crop.status == "Completed"
+                            ? Colors.green
+                            : (crop.status == "Pending"
+                            ? Colors.orange
+                            : Colors.blue),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
+        ),
+      );
+    },
   );
 }
+
 
 
 
