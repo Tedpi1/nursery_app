@@ -39,14 +39,14 @@ Widget _cropDetail(
   double headingFontSize;
   double dataFontSize;
   if (screenWidth < 400) {
-    headingFontSize = 8;
-    dataFontSize = 7;
-  } else if (screenWidth < 700) {
     headingFontSize = 10;
-    dataFontSize = 9;
-  } else {
-    headingFontSize = 12;
     dataFontSize = 11;
+  } else if (screenWidth < 700) {
+    headingFontSize = 12;
+    dataFontSize = 13;
+  } else {
+    headingFontSize = 14;
+    dataFontSize = 15;
   }
 
   return SingleChildScrollView(

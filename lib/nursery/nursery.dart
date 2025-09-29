@@ -126,7 +126,18 @@ Widget _dashboardTable(BuildContext context) {
   return LayoutBuilder(
     builder: (context, constraints) {
       final double colWidth = constraints.maxWidth / 7; // 7 columns in your case
-
+      double headingFontSize;
+      double dataFontSize;
+      if (screenWidth < 400) {
+        headingFontSize = 10;
+        dataFontSize = 11;
+      } else if (screenWidth < 700) {
+        headingFontSize = 12;
+        dataFontSize = 13;
+      } else {
+        headingFontSize = 14;
+        dataFontSize = 15;
+      }
       return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
@@ -138,13 +149,13 @@ Widget _dashboardTable(BuildContext context) {
           headingRowColor: MaterialStateProperty.all(Colors.black87),
           headingTextStyle: TextStyle(
             color: Colors.white,
-            fontSize: headingFontSize,
+            fontSize: headingFontSize, // responsive header
             fontWeight: FontWeight.bold,
           ),
 
           // 👇 Data row style
           dataTextStyle: TextStyle(
-            fontSize: dataFontSize,
+            fontSize: dataFontSize, // responsive values
             color: Colors.black87,
           ),
 
@@ -189,6 +200,7 @@ Widget _dashboardTable(BuildContext context) {
           }).toList(),
         ),
       );
+
     },
   );
 }
