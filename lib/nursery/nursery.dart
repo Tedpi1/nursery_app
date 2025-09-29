@@ -12,7 +12,7 @@ class NurseryDashboard extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          "🌱 NurserIES Crop Batches & Summary (Wk 39)",
+          "🌱 NurseryCrop Batches & Summary (Wk 39)",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
