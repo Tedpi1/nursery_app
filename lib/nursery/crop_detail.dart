@@ -130,8 +130,8 @@ Widget _cropDetail(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: SizedBox(
-                                    width: screenSize.width * 0.2,
-                                    height: screenSize.height * 0.2,
+                                    width: screenSize.width * 0.8,
+                                    height: screenSize.height * 0.8,
                                     child: NurseryBatchDialog(crop: crop),
                                   ),
                                 ),

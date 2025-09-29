@@ -86,12 +86,16 @@ class _NurseryBatchDialogState extends State<NurseryBatchDialog> {
     showDialog(
       context: context,
       builder: (context) {
+        final screenSize = MediaQuery.of(context).size;
         return Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
           child: SizedBox(
-            width: 400, // 👈 Set a fixed or max width
+            // 👇 Take 80% of screen width on large devices, 95% on small
+              width: screenSize.width * 0.8,
+              // 👇 Optional: give it a max height so it scrolls if too tall
+              height: screenSize.height * 0.6,
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: SingleChildScrollView(
@@ -521,11 +525,11 @@ class _NurseryBatchDialogState extends State<NurseryBatchDialog> {
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
                 ),
-                child: const Text("Add Nursery Activity"),
+                child: const Text("Add Activity"),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 8,),
 
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
