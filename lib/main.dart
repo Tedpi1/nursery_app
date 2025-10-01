@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:nursery_app/nursery/nursery.dart';
+
+
+import 'home/home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: NurseryDashboard(),
+      home: homepage(),
     );
   }
 }
