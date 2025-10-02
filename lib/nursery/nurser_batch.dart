@@ -249,33 +249,69 @@ class _NurseryBatchDialogState extends State<NurseryBatchDialog> {
           ),
         ],
       ),
-      body: ListView(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        children: [
-          // Call your mini-widgets
-          CropInfoTable(crop, deficit),
-          const SizedBox(height: 16),
-          NurseryBlockForm(),
-          const SizedBox(height: 24),
-          PropagulesTabs(),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Saved/Updated")),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-              minimumSize: const Size(double.infinity, 48),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch, // full width children
+          children: [
+            // Crop info
+            Card(
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: CropInfoTable(crop, deficit),
+              ),
             ),
-            child: const Text("Save/Update"),
-          ),
-          const SizedBox(height: 32),
-          ActivitiesSection(),
-        ],
+            const SizedBox(height: 16),
+
+            // Nursery form
+            Card(
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: NurseryBlockForm(),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Propagules tabs
+            Card(
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: PropagulesTabs(),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Save button
+            ElevatedButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Saved/Updated")),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 48),
+              ),
+              child: const Text("Save/Update"),
+            ),
+            const SizedBox(height: 32),
+
+            // Activities section
+            Card(
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: ActivitiesSection(),
+              ),
+            ),
+          ],
+        ),
       ),
+
     );
   }
 
@@ -441,50 +477,85 @@ class _NurseryBatchDialogState extends State<NurseryBatchDialog> {
   }
 
   Widget ActivitiesSection() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool isWide = constraints.maxWidth > 400;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Nursery Activities",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            // Title + Button (Row or Column based on screen width)
+            isWide
+                ? Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Nursery Activities",
+                  style:
+                  TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                ElevatedButton(
+                  onPressed: _showActivityDialog,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text("Add Activity"),
+                ),
+              ],
+            )
+                : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Nursery Activities",
+                  style:
+                  TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: _showActivityDialog,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text("Add Activity"),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: _showActivityDialog,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
+
+            const SizedBox(height: 8),
+
+            // Full width DataTable
+            SizedBox(
+              width: double.infinity, // 👈 ensures table fills screen width
+              child: DataTable(
+                columnSpacing: 24, // adjust spacing between columns
+                headingRowColor: MaterialStateProperty.all(Colors.grey.shade200),
+                columns: const [
+                  DataColumn(label: Text("Date")),
+                  DataColumn(label: Text("Activity")),
+                  DataColumn(label: Text("Workers")),
+                  DataColumn(label: Text("Total Hrs")),
+                ],
+                rows: activities
+                    .map(
+                      (a) => DataRow(
+                    cells: [
+                      DataCell(Text(a.date)),
+                      DataCell(Text(a.activity)),
+                      DataCell(Text(a.workers.toString())),
+                      DataCell(Text(a.totalHours.toString())),
+                    ],
+                  ),
+                )
+                    .toList(),
               ),
-              child: const Text("Add Activity"),
             ),
           ],
-        ),
-        const SizedBox(height: 8),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            columns: const [
-              DataColumn(label: Text("Date")),
-              DataColumn(label: Text("Activity")),
-              DataColumn(label: Text("Workers")),
-              DataColumn(label: Text("Total Hrs")),
-            ],
-            rows: activities
-                .map(
-                  (a) => DataRow(
-                cells: [
-                  DataCell(Text(a.date)),
-                  DataCell(Text(a.activity)),
-                  DataCell(Text(a.workers.toString())),
-                  DataCell(Text(a.totalHours.toString())),
-                ],
-              ),
-            )
-                .toList(),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
+
 }
