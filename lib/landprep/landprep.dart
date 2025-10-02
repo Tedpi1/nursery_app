@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nursery_app/constant/color.dart';
 import 'package:nursery_app/nursery/crop_detail.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -11,7 +12,7 @@ class LandPrepPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.warning,
         elevation: 0,
         title: const Text(
           "Land Preparations",
@@ -40,7 +41,8 @@ Widget _dashboardTable(BuildContext context) {
 
   return LayoutBuilder(
     builder: (context, constraints) {
-      final double colWidth = constraints.maxWidth / 5; // 7 columns in your case
+      final double colWidth = constraints.maxWidth / 7; // 7 columns in your case
+      final double actionColWidth = colWidth * 2;
       double headingFontSize;
       double dataFontSize;
       if (screenWidth < 400) {
@@ -81,7 +83,7 @@ Widget _dashboardTable(BuildContext context) {
             DataColumn(label: SizedBox(width: colWidth, child: Text("PlantingWk-Year"))),
 
             DataColumn(label: SizedBox(width: colWidth, child: Text("Status"))),
-            DataColumn(label: SizedBox(width: colWidth, child: Text("#"))),
+            DataColumn(label: SizedBox(width: actionColWidth, child: Text("#"))),
           ],
 
           rows: _land.map((land) {
@@ -96,7 +98,7 @@ Widget _dashboardTable(BuildContext context) {
 
                 DataCell(
                   SizedBox(
-                    width: colWidth,
+                    width: actionColWidth,
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.push(
