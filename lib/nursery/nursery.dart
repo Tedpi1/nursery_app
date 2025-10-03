@@ -102,6 +102,7 @@ class _NurseryDashboardState extends State<NurseryDashboard> {
   }
 
 
+
   // 🔹 Reset filters
   void resetFilters() {
     setState(() {
@@ -130,273 +131,7 @@ class _NurseryDashboardState extends State<NurseryDashboard> {
         child: Column(
           children: [
             // 🔹 Search + Filter Row
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: "Search crop...",
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setState(() => searchQuery = value);
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-
-                  // ⛳ Filter button
-                  IconButton(
-                    icon: const Icon(Icons.filter_list, color: Colors.black54),
-                    onPressed: () {
-                      showGeneralDialog(
-                        context: context,
-                        barrierDismissible: true,
-                        barrierLabel: 'Filter',
-                        transitionDuration: const Duration(milliseconds: 300),
-                        pageBuilder: (context, anim1, anim2) {
-                          final screenWidth = MediaQuery.of(context).size.width;
-
-                          // 🔹 Adaptive width: Sidebar on desktop/tablet, full width on phone
-                          double dialogWidth = screenWidth > 800
-                              ? screenWidth * 0.4
-                              : screenWidth * 0.9;
-
-                          return Align(
-                            alignment: Alignment.centerRight,
-                            child: Material(
-                              color: Colors.white,
-                              elevation: 8,
-                              child: SafeArea(
-                                child: SizedBox(
-                                  width: dialogWidth,
-                                  height: MediaQuery.of(context).size.height*0.7,
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: screenWidth < 400 ? 10 : 20,
-                                      vertical: 10,
-                                    ),
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          // Header row
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              const Text(
-                                                "Filter",
-                                                style: TextStyle(
-                                                    fontSize: 18, fontWeight: FontWeight.bold),
-                                              ),
-                                              IconButton(
-                                                icon: const Icon(Icons.close, color: Colors.red),
-                                                onPressed: () => Navigator.pop(context),
-                                              ),
-                                            ],
-                                          ),
-                                          const Divider(),
-                                          const SizedBox(height: 10),
-
-                                          // 🔹 Crop filter
-                                          DropdownButtonFormField<String>(
-                                            value: cropFilter,
-                                            decoration: const InputDecoration(
-                                              labelText: "Crop",
-                                              border: OutlineInputBorder(),
-                                            ),
-                                            items: _crops
-                                                .map((c) => c.crop)
-                                                .toSet()
-                                                .map((crop) => DropdownMenuItem(
-                                              value: crop,
-                                              child: Text(crop),
-                                            ))
-                                                .toList(),
-                                            onChanged: (value) {
-                                              setState(() => cropFilter = value);
-                                            },
-                                          ),
-                                          const SizedBox(height: 20),
-
-                                          // 🔹 Partition filter
-                                          DropdownButtonFormField<String>(
-                                            value: partitionFilter,
-                                            decoration: const InputDecoration(
-                                              labelText: "Partition",
-                                              border: OutlineInputBorder(),
-                                            ),
-                                            items: _crops
-                                                .map((c) => c.partitions)
-                                                .toSet()
-                                                .map((p) => DropdownMenuItem(
-                                              value: p,
-                                              child: Text(p),
-                                            ))
-                                                .toList(),
-                                            onChanged: (value) {
-                                              setState(() => partitionFilter = value);
-                                            },
-                                          ),
-                                          const SizedBox(height: 20),
-
-                                          // 🔹 Status filter
-                                          DropdownButtonFormField<String>(
-                                            value: statusFilter,
-                                            decoration: const InputDecoration(
-                                              labelText: "Status",
-                                              border: OutlineInputBorder(),
-                                            ),
-                                            items: _crops
-                                                .map((c) => c.status)
-                                                .toSet()
-                                                .map((s) => DropdownMenuItem(
-                                              value: s,
-                                              child: Text(s),
-                                            ))
-                                                .toList(),
-                                            onChanged: (value) {
-                                              setState(() => statusFilter = value);
-                                            },
-                                          ),
-                                          const SizedBox(height: 20),
-
-                                          // 🔹 Sowing date range picker
-                                          InkWell(
-                                            onTap: () async {
-                                              final picked = await showCustomDateRangeDialog(context);
-                                              if (picked != null) {
-                                                setState(() {
-                                                  sowingFromDate = picked.start;
-                                                  sowingToDate = picked.end;
-                                                });
-                                              }
-                                            },
-                                            child: InputDecorator(
-                                              decoration: const InputDecoration(
-                                                labelText: "Sowing Date Range",
-                                                border: OutlineInputBorder(),
-                                              ),
-                                              child: Text(
-                                                (sowingFromDate != null && sowingToDate != null)
-                                                    ? "${DateFormat('dd/MM/yyyy').format(sowingFromDate!)} - ${DateFormat('dd/MM/yyyy').format(sowingToDate!)}"
-                                                    : "Select Date Range",
-                                              ),
-                                            ),
-                                          ),
-
-                                          const SizedBox(height: 20),
-
-                                          // 🔹 Planting date range picker
-                                          InkWell(
-                                            onTap: () async {
-                                              final picked = await showCustomDateRangeDialog(context);
-                                              if (picked != null) {
-                                                setState(() {
-                                                  plantingFromDate = picked.start;
-                                                  plantingToDate = picked.end;
-                                                });
-                                              }
-                                            },
-                                            child: InputDecorator(
-                                              decoration: const InputDecoration(
-                                                labelText: "Planting Date Range",
-                                                border: OutlineInputBorder(),
-                                              ),
-                                              child: Text(
-                                                (plantingFromDate != null && plantingToDate != null)
-                                                    ? "${DateFormat('dd/MM/yyyy').format(plantingFromDate!)} - ${DateFormat('dd/MM/yyyy').format(plantingToDate!)}"
-                                                    : "Select Date Range",
-                                              ),
-                                            ),
-                                          ),
-
-                                          const SizedBox(height: 30),
-
-                                          // 🔹 Responsive Buttons
-                                          LayoutBuilder(
-                                            builder: (context, constraints) {
-                                              if (constraints.maxWidth < 300) {
-                                                // Small screen → vertical buttons
-                                                return Column(
-                                                  children: [
-                                                    OutlinedButton(
-                                                      onPressed: resetFilters,
-                                                      child: const Text("Reset"),
-                                                    ),
-                                                    const SizedBox(height: 10),
-                                                    ElevatedButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                        setState(() {});
-                                                      },
-                                                      style: ElevatedButton.styleFrom(
-                                                          backgroundColor: Colors.green),
-                                                      child: const Text("Apply"),
-                                                    ),
-                                                  ],
-                                                );
-                                              } else {
-                                                // Normal → side by side
-                                                return Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: OutlinedButton(
-                                                        onPressed: resetFilters,
-                                                        child: const Text("Reset"),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 16),
-                                                    Expanded(
-                                                      child: ElevatedButton(
-                                                        onPressed: () {
-                                                          Navigator.pop(context);
-                                                          setState(() {});
-                                                        },
-                                                        style: ElevatedButton.styleFrom(
-                                                            backgroundColor: Colors.green),
-                                                        child: const Text("Apply"),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                              }
-                                            },
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                        transitionBuilder: (context, anim1, anim2, child) {
-                          return SlideTransition(
-                            position: Tween(
-                              begin: const Offset(1, 0),
-                              end: Offset.zero,
-                            ).animate(CurvedAnimation(
-                              parent: anim1,
-                              curve: Curves.easeOut,
-                            )),
-                            child: child,
-                          );
-                        },
-                      );
-                    },
-                  )
-
-                ],
-              ),
-            ),
-
+            buildSearchAndFilterBar(context),
             _dashboardSection(context, filteredCrops),
             const SizedBox(height: 20),
             _dashboardTable(context, filteredCrops),
@@ -405,7 +140,288 @@ class _NurseryDashboardState extends State<NurseryDashboard> {
       ),
     );
   }
+  Widget buildSearchAndFilterBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: "Search crop...",
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onChanged: (value) {
+
+                setState(() => searchQuery = value);
+              },
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          // ⛳ Filter button
+          IconButton(
+            icon: const Icon(Icons.filter_list, color: Colors.black54),
+            onPressed: () {
+              showGeneralDialog(
+                context: context,
+                barrierDismissible: true,
+                barrierLabel: 'Filter',
+                transitionDuration: const Duration(milliseconds: 300),
+                pageBuilder: (context, anim1, anim2) {
+                  final screenWidth = MediaQuery.of(context).size.width;
+
+                  // 🔹 Adaptive width: Sidebar on desktop/tablet, full width on phone
+                  double dialogWidth =
+                  screenWidth > 800 ? screenWidth * 0.4 : screenWidth * 0.9;
+
+                  return Align(
+                    alignment: Alignment.centerRight,
+                    child: Material(
+                      color: Colors.white,
+                      elevation: 8,
+                      child: SafeArea(
+                        child: SizedBox(
+                          width: dialogWidth,
+                          height: MediaQuery.of(context).size.height * 0.7,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth < 400 ? 10 : 20,
+                              vertical: 10,
+                            ),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Header row
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "Filter",
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.close,
+                                            color: Colors.red),
+                                        onPressed: () =>
+                                            Navigator.pop(context),
+                                      ),
+                                    ],
+                                  ),
+                                  const Divider(),
+                                  const SizedBox(height: 10),
+
+                                  // 🔹 Crop filter
+                                  DropdownButtonFormField<String>(
+                                    value: cropFilter,
+                                    decoration: const InputDecoration(
+                                      labelText: "Crop",
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    items: _crops
+                                        .map((c) => c.crop)
+                                        .toSet()
+                                        .map((crop) => DropdownMenuItem(
+                                      value: crop,
+                                      child: Text(crop),
+                                    ))
+                                        .toList(),
+                                    onChanged: (value) {
+                                      setState(() => cropFilter = value);
+                                    },
+                                  ),
+                                  const SizedBox(height: 20),
+
+                                  // 🔹 Partition filter
+                                  DropdownButtonFormField<String>(
+                                    value: partitionFilter,
+                                    decoration: const InputDecoration(
+                                      labelText: "Partition",
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    items: _crops
+                                        .map((c) => c.partitions)
+                                        .toSet()
+                                        .map((p) => DropdownMenuItem(
+                                      value: p,
+                                      child: Text(p),
+                                    ))
+                                        .toList(),
+                                    onChanged: (value) {
+                                      setState(() => partitionFilter = value);
+                                    },
+                                  ),
+                                  const SizedBox(height: 20),
+
+                                  // 🔹 Status filter
+                                  DropdownButtonFormField<String>(
+                                    value: statusFilter,
+                                    decoration: const InputDecoration(
+                                      labelText: "Status",
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    items: _crops
+                                        .map((c) => c.status)
+                                        .toSet()
+                                        .map((s) => DropdownMenuItem(
+                                      value: s,
+                                      child: Text(s),
+                                    ))
+                                        .toList(),
+                                    onChanged: (value) {
+                                      setState(() => statusFilter = value);
+                                    },
+                                  ),
+                                  const SizedBox(height: 20),
+
+                                  // 🔹 Sowing date range picker
+                                  InkWell(
+                                    onTap: () async {
+                                      final picked =
+                                      await showCustomDateRangeDialog(
+                                          context);
+                                      if (picked != null) {
+                                        setState(() {
+                                          sowingFromDate = picked.start;
+                                          sowingToDate = picked.end;
+                                        });
+                                      }
+                                    },
+                                    child: InputDecorator(
+                                      decoration: const InputDecoration(
+                                        labelText: "Sowing Date Range",
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      child: Text(
+                                        (sowingFromDate != null &&
+                                            sowingToDate != null)
+                                            ? "${DateFormat('dd/MM/yyyy').format(sowingFromDate!)} - ${DateFormat('dd/MM/yyyy').format(sowingToDate!)}"
+                                            : "Select Date Range",
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 20),
+
+                                  // 🔹 Planting date range picker
+                                  InkWell(
+                                    onTap: () async {
+                                      final picked =
+                                      await showCustomDateRangeDialog(
+                                          context);
+                                      if (picked != null) {
+                                        setState(() {
+                                          plantingFromDate = picked.start;
+                                          plantingToDate = picked.end;
+                                        });
+                                      }
+                                    },
+                                    child: InputDecorator(
+                                      decoration: const InputDecoration(
+                                        labelText: "Planting Date Range",
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      child: Text(
+                                        (plantingFromDate != null &&
+                                            plantingToDate != null)
+                                            ? "${DateFormat('dd/MM/yyyy').format(plantingFromDate!)} - ${DateFormat('dd/MM/yyyy').format(plantingToDate!)}"
+                                            : "Select Date Range",
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 30),
+
+                                  // 🔹 Responsive Buttons
+                                  LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      if (constraints.maxWidth < 300) {
+                                        // Small screen → vertical buttons
+                                        return Column(
+                                          children: [
+                                            OutlinedButton(
+                                              onPressed: resetFilters,
+                                              child: const Text("Reset"),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                setState(() {});
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                  Colors.green),
+                                              child: const Text("Apply"),
+                                            ),
+                                          ],
+                                        );
+                                      } else {
+                                        // Normal → side by side
+                                        return Row(
+                                          children: [
+                                            Expanded(
+                                              child: OutlinedButton(
+                                                onPressed: resetFilters,
+                                                child: const Text("Reset"),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                  setState(() {});
+                                                },
+                                                style: ElevatedButton
+                                                    .styleFrom(
+                                                    backgroundColor:
+                                                    Colors.green),
+                                                child: const Text("Apply"),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                    },
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                transitionBuilder: (context, anim1, anim2, child) {
+                  return SlideTransition(
+                    position: Tween(
+                      begin: const Offset(1, 0),
+                      end: Offset.zero,
+                    ).animate(CurvedAnimation(
+                      parent: anim1,
+                      curve: Curves.easeOut,
+                    )),
+                    child: child,
+                  );
+                },
+              );
+            },
+          )
+        ],
+      ),
+    );
+  }
 }
+
 
 // Chart
 Widget _dashboardSection(BuildContext context, List<CropData> crops) {
@@ -559,6 +575,8 @@ Widget _dashboardTable(BuildContext context, List<CropData> crops) {
     },
   );
 }
+
+
 
 // Example dataset
 final List<CropData> _crops = [

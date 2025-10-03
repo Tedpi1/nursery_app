@@ -22,6 +22,7 @@ class _LandPreparationPageState extends State<LandPreparationPage> {
   final TextEditingController activityController = TextEditingController();
   final TextEditingController workerController = TextEditingController();
   double totalHours = 0;
+  String? _selectedOption; // "Yes" or "No"
 
 
   // Toggles
@@ -355,7 +356,7 @@ class _LandPreparationPageState extends State<LandPreparationPage> {
                         // Save logic
                       },
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.purple,
+                        foregroundColor: Colors.brown,
                         backgroundColor: Colors.white,
                       ),
                       child: const Text("Save/Update Bedmaking Information"),
@@ -370,31 +371,88 @@ class _LandPreparationPageState extends State<LandPreparationPage> {
             // Section: Planting Ready Confirmation
             Card(
               elevation: 2,
-              color: Colors.green.shade50,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+              color: _selectedOption == "Yes"
+                  ? Colors.green.shade800 // ✅ Deep green for Yes
+                  : _selectedOption == "No"
+                  ? Colors.red // ✅ Red for No
+                  : null, // default if not selected
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    const Text("🌱 Planting Ready Confirmation",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Confirmation logic
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.red,
-                        backgroundColor: Colors.white,
+                    Text(
+                      "Is the Block ready?",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: _selectedOption == null
+                            ? Colors.black
+                            : Colors.white, // ✅ White text when Yes/No chosen
                       ),
-                      child: const Text("Unmark Ready for Planting Status"),
-                    )
+                    ),
+
+                    const Divider(),
+
+                    // ✅ Yes/No options
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: RadioListTile<String>(
+                            activeColor: Colors.white, // ✅ radio button circle color
+                            title: Text(
+                              "Yes",
+                              style: TextStyle(
+                                color: _selectedOption == "Yes"
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            ),
+                            value: "Yes",
+                            groupValue: _selectedOption,
+                            onChanged: (value) {
+                              setState(() => _selectedOption = value);
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile<String>(
+                            activeColor: Colors.white, // ✅ radio button circle color
+                            title: Text(
+                              "No",
+                              style: TextStyle(
+                                color: _selectedOption == "No"
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                            ),
+                            value: "No",
+                            groupValue: _selectedOption,
+                            onChanged: (value) {
+                              setState(() => _selectedOption = value);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    if (_selectedOption != null)
+                      Text(
+                        "Selected: $_selectedOption",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white, // ✅ Always white on colored card
+                        ),
+                      ),
                   ],
                 ),
               ),
             ),
+
+
 
             const SizedBox(height: 20),
 
