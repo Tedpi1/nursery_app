@@ -484,15 +484,15 @@ class _NurseryBatchDialogState extends State<NurseryBatchDialog> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title + Button (Row or Column based on screen width)
+            // Title + Button
             isWide
                 ? Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
                   "Nursery Activities",
-                  style:
-                  TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 ElevatedButton(
                   onPressed: _showActivityDialog,
@@ -509,8 +509,8 @@ class _NurseryBatchDialogState extends State<NurseryBatchDialog> {
               children: [
                 const Text(
                   "Nursery Activities",
-                  style:
-                  TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 ElevatedButton(
@@ -526,12 +526,13 @@ class _NurseryBatchDialogState extends State<NurseryBatchDialog> {
 
             const SizedBox(height: 8),
 
-            // Full width DataTable
-            SizedBox(
-              width: double.infinity, // 👈 ensures table fills screen width
+            // ✅ Scrollable DataTable
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
               child: DataTable(
-                columnSpacing: 24, // adjust spacing between columns
-                headingRowColor: MaterialStateProperty.all(Colors.grey.shade200),
+                columnSpacing: 24,
+                headingRowColor:
+                MaterialStateProperty.all(Colors.grey.shade200),
                 columns: const [
                   DataColumn(label: Text("Date")),
                   DataColumn(label: Text("Activity")),
@@ -557,5 +558,6 @@ class _NurseryBatchDialogState extends State<NurseryBatchDialog> {
       },
     );
   }
+
 
 }
