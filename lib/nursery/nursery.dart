@@ -1,12 +1,60 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nursery_app/constant/color.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'crop_detail.dart';
 import 'package:intl/intl.dart';
 
+//db columns
+class CropData {
+  final String crop;
+  final int seedsRequired;
+  final int achieved;
+  final String partitions;
+  final String sowingDate;
+  final String plantingDate;
+  final String status;
+
+  CropData({
+    required this.crop,
+    required this.seedsRequired,
+    required this.achieved,
+    required this.partitions,
+    required this.sowingDate,
+    required this.plantingDate,
+    required this.status,
+  });
+
+  factory CropData.fromJson(Map<String, dynamic> json) {
+    return CropData(
+      crop: json['crop'],
+      seedsRequired: json['seedsRequired'],
+      achieved: json['achieved'],
+      partitions: json['partitions'],
+      sowingDate: json['sowingDate'],
+      plantingDate: json['plantingDate'],
+      status: json['status'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'crop': crop,
+    'seedsRequired': seedsRequired,
+    'achieved': achieved,
+    'partitions': partitions,
+    'sowingDate': sowingDate,
+    'plantingDate': plantingDate,
+    'status': status,
+  };
+}
+
+
 class NurseryDashboard extends StatefulWidget {
   const NurseryDashboard({super.key});
+
 
   @override
   State<NurseryDashboard> createState() => _NurseryDashboardState();
@@ -14,7 +62,7 @@ class NurseryDashboard extends StatefulWidget {
 
 class _NurseryDashboardState extends State<NurseryDashboard> {
   String searchQuery = "";
-
+  List<CropData> _crops = [];
   // 🔹 Filters
   String? cropFilter;
   String? partitionFilter;
@@ -26,6 +74,116 @@ class _NurseryDashboardState extends State<NurseryDashboard> {
   DateTime? plantingToDate;
 
   final DateFormat formatter = DateFormat("dd MMM yyyy");
+
+  DateTime? tryParseDate(String dateStr) {
+    try {
+      // First, try ISO 8601 format (like 2025-09-01)
+      return DateFormat("yyyy-MM-dd").parse(dateStr);
+    } catch (_) {
+      try {
+        // Then try the "dd MMM yyyy" fallback
+        return DateFormat("dd MMM yyyy").parse(dateStr);
+      } catch (e) {
+        debugPrint("⚠️ Date parse error: $dateStr");
+        return null;
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadCropData();
+  }
+  Future<void> loadCropData() async {
+    final String response = await rootBundle.loadString('assets/crop.json');
+    final data = json.decode(response) as List;
+    setState(() {
+      _crops = data.map((json) => CropData.fromJson(json)).toList();
+    });
+  }
+  Future<void> _showFilterDialog(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text("Filter"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                DropdownButtonFormField<String>(
+                  value: cropFilter,
+                  decoration: const InputDecoration(
+                    labelText: "Crop",
+                    border: OutlineInputBorder(),
+                  ),
+                  items: _crops
+                      .map((c) => c.crop)
+                      .toSet()
+                      .map((crop) => DropdownMenuItem(
+                    value: crop,
+                    child: Text(crop),
+                  ))
+                      .toList(),
+                  onChanged: (value) => setState(() => cropFilter = value),
+                ),
+                const SizedBox(height: 20),
+                DropdownButtonFormField<String>(
+                  value: partitionFilter,
+                  decoration: const InputDecoration(
+                    labelText: "Partition",
+                    border: OutlineInputBorder(),
+                  ),
+                  items: _crops
+                      .map((c) => c.partitions)
+                      .toSet()
+                      .map((p) => DropdownMenuItem(
+                    value: p,
+                    child: Text(p),
+                  ))
+                      .toList(),
+                  onChanged: (value) => setState(() => partitionFilter = value),
+                ),
+                const SizedBox(height: 20),
+                DropdownButtonFormField<String>(
+                  value: statusFilter,
+                  decoration: const InputDecoration(
+                    labelText: "Status",
+                    border: OutlineInputBorder(),
+                  ),
+                  items: _crops
+                      .map((c) => c.status)
+                      .toSet()
+                      .map((s) => DropdownMenuItem(
+                    value: s,
+                    child: Text(s),
+                  ))
+                      .toList(),
+                  onChanged: (value) => setState(() => statusFilter = value),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                resetFilters();
+                Navigator.pop(ctx);
+              },
+              child: const Text("Reset"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {});
+                Navigator.pop(ctx);
+              },
+              child: const Text("Apply"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   // 🔹 Get filtered crops
   List<CropData> get filteredCrops {
@@ -39,9 +197,12 @@ class _NurseryDashboardState extends State<NurseryDashboard> {
       final matchesStatus =
           statusFilter == null || crop.status == statusFilter;
 
-      // Parse crop dates
-      DateTime cropSowing = formatter.parse(crop.sowingDate);
-      DateTime cropPlanting = formatter.parse(crop.plantingDate);
+      // ✅ Safe date parsing
+      final cropSowing = tryParseDate(crop.sowingDate);
+      final cropPlanting = tryParseDate(crop.plantingDate);
+
+      // Ignore this crop if we can’t parse the date
+      if (cropSowing == null || cropPlanting == null) return false;
 
       final matchesSowing = (sowingFromDate == null && sowingToDate == null) ||
           (sowingFromDate != null &&
@@ -63,6 +224,19 @@ class _NurseryDashboardState extends State<NurseryDashboard> {
           matchesSowing &&
           matchesPlanting;
     }).toList();
+  }
+
+
+  void resetFilters() {
+    setState(() {
+      cropFilter = null;
+      partitionFilter = null;
+      statusFilter = null;
+      sowingFromDate = null;
+      sowingToDate = null;
+      plantingFromDate = null;
+      plantingToDate = null;
+    });
   }
   Future<DateTimeRange?> showCustomDateRangeDialog(BuildContext context) {
     DateTime? start;
@@ -104,17 +278,7 @@ class _NurseryDashboardState extends State<NurseryDashboard> {
 
 
   // 🔹 Reset filters
-  void resetFilters() {
-    setState(() {
-      cropFilter = null;
-      partitionFilter = null;
-      statusFilter = null;
-      sowingFromDate = null;
-      sowingToDate = null;
-      plantingFromDate = null;
-      plantingToDate = null;
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -422,6 +586,12 @@ class _NurseryDashboardState extends State<NurseryDashboard> {
   }
 }
 
+  //filter box
+
+
+
+
+
 
 // Chart
 Widget _dashboardSection(BuildContext context, List<CropData> crops) {
@@ -443,9 +613,10 @@ Widget _dashboardSection(BuildContext context, List<CropData> crops) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CropDetailPage(crop: selectedCrop),
+                  builder: (context) => CropDetailPage(cropName: selectedCrop.crop),
                 ),
               );
+
             }
           },
         ),
@@ -461,9 +632,10 @@ Widget _dashboardSection(BuildContext context, List<CropData> crops) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CropDetailPage(crop: selectedCrop),
+                  builder: (context) => CropDetailPage(cropName: selectedCrop.crop),
                 ),
               );
+
             }
           },
         ),
@@ -579,23 +751,4 @@ Widget _dashboardTable(BuildContext context, List<CropData> crops) {
 
 
 // Example dataset
-final List<CropData> _crops = [
-  CropData("CARROT", 1500, 0, "AREA D BLOCK C4", "01 Oct 2025", "01 Nov 2025", "Pending"),
-  CropData("SPINACH", 900, 300, "AREA E BLOCK S5", "05 Sep 2025", "05 Oct 2025", "Ongoing"),
-  CropData("PEPPER", 1800, 0, "AREA F BLOCK P6", "10 Sep 2025", "10 Oct 2025", "Pending"),
-  CropData("CUCUMBER", 2000, 1000, "AREA G BLOCK C7", "12 Sep 2025", "12 Oct 2025", "Ongoing"),
-  CropData("RADISH", 700, 700, "AREA H BLOCK R8", "08 Sep 2025", "08 Oct 2025", "Completed"),
-];
 
-class CropData {
-  final String crop;
-  final int seedsRequired;
-  final int achieved;
-  final String partitions;
-  final String sowingDate;
-  final String plantingDate;
-  final String status;
-
-  CropData(this.crop, this.seedsRequired, this.achieved, this.partitions,
-      this.sowingDate, this.plantingDate, this.status);
-}

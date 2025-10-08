@@ -1,36 +1,82 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:nursery_app/nursery/nurser_batch.dart';
-import 'package:nursery_app/nursery/nursery.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class CropDetailPage extends StatelessWidget {
-  final CropData crop;
 
-  const CropDetailPage({super.key, required this.crop});
+import '../model/crop_model.dart';
+import 'nurser_batch.dart';
+
+class CropDetailPage extends StatefulWidget {
+  final String cropName;
+
+  const CropDetailPage({super.key, required this.cropName});
+
+  @override
+  State<CropDetailPage> createState() => _CropDetailPageState();
+}
+
+class _CropDetailPageState extends State<CropDetailPage> {
+  cropDetails? crop;
+
+  @override
+  void initState() {
+    super.initState();
+    loadcropDetails();
+  }
+
+  Future<void> loadcropDetails() async {
+    final String response =
+    await rootBundle.loadString('assets/crop.json');
+    final data = json.decode(response) as List;
+    final crops = data.map((json) => cropDetails.fromJson(json)).toList();
+
+    setState(() {
+      crop = crops.firstWhere(
+            (c) => c.crop.toLowerCase() == widget.cropName.toLowerCase(),
+        orElse: () => crops.first,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final deficit = crop.seedsRequired - crop.achieved;
+    if (crop == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("${widget.cropName} DETAILS"),
+          backgroundColor: Colors.green,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
-    // 🔹 Pie chart dataset
+    // 🔹 Summarize for chart
+    final totalSeeds = crop!.batches.fold<int>(
+        0, (sum, b) => sum + b.seedsRequired);
+    final totalAchieved =
+    crop!.batches.fold<int>(0, (sum, b) => sum + b.achieved);
+    final totalDeficit = totalSeeds - totalAchieved;
+
     final List<PieData> chartData = [
-      PieData('Achieved', crop.achieved.toDouble(), Colors.green),
-      PieData('Deficit', deficit.toDouble(), Colors.red),
+      PieData('Achieved', totalAchieved.toDouble(), Colors.green),
+      PieData('Deficit', totalDeficit.toDouble(), Colors.red),
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("${crop.crop} DETAILS"),
+        title: Text("${crop!.crop} DETAILS"),
         backgroundColor: Colors.green,
       ),
-    body: _cropDetail(context, crop, deficit, chartData),
+      body: _cropDetail(context, crop!, chartData),
+
     );
   }
 }
+
 Widget _cropDetail(
     BuildContext context,
-    CropData crop,
-    int deficit,
+    cropDetails crop,
     List<PieData> chartData,
     ) {
   final double screenWidth = MediaQuery.of(context).size.width;
@@ -87,7 +133,6 @@ Widget _cropDetail(
                     DataColumn(label: SizedBox(width: colWidth, child: Text("PlantingDate"))),
                     DataColumn(label: SizedBox(width: colWidth, child: Text("SeedsReq."))),
                     DataColumn(label: SizedBox(width: colWidth, child: Text("Achieved"))),
-                    DataColumn(label: SizedBox(width: colWidth, child: Text("Deficit"))),
                     DataColumn(label: SizedBox(width: colWidth, child: Text("Status"))),
                     DataColumn(label: SizedBox(width: colWidth, child: Text("#"))),
                   ],
@@ -101,7 +146,7 @@ Widget _cropDetail(
                         DataCell(SizedBox(width: colWidth, child: Text(crop.plantingDate))),
                         DataCell(SizedBox(width: colWidth, child: Text(crop.seedsRequired.toString()))),
                         DataCell(SizedBox(width: colWidth, child: Text(crop.achieved.toString()))),
-                        DataCell(SizedBox(width: colWidth, child: Text(deficit.toString()))),
+
                         DataCell(
                           SizedBox(
                             width: colWidth,
@@ -173,9 +218,6 @@ Widget _cropDetail(
     ),
   );
 }
-
-
-/// 🔹 Helper Data Model for Pie Chart
 class PieData {
   final String category;
   final double value;

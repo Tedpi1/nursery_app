@@ -1,0 +1,218 @@
+[
+  {
+    "crop": "Tomatoes",
+    "partitions": "A1",
+    "sowingDate": "2025-09-01",
+    "plantingDate": "2025-09-10",
+    "seedsRequired": 1000,
+    "achieved": 800,
+    "status": "Ongoing",
+    "batches": [
+      {
+        "batchID": "B001",
+        "sowingDate": "2025-09-01",
+        "plantingDate": "2025-09-10",
+        "seedsRequired": 500,
+        "achieved": 400,
+        "status": "Ongoing"
+      },
+      {
+        "batchID": "B002",
+        "sowingDate": "2025-09-02",
+        "plantingDate": "2025-09-11",
+        "seedsRequired": 500,
+        "achieved": 400,
+        "status": "Ongoing"
+      }
+    ]
+  },
+  {
+    "crop": "Spinach",
+    "partitions": "B2",
+    "sowingDate": "2025-08-15",
+    "plantingDate": "2025-08-25",
+    "seedsRequired": 800,
+    "achieved": 780,
+    "status": "Completed",
+    "batches": [
+      {
+        "batchID": "B003",
+        "sowingDate": "2025-08-15",
+        "plantingDate": "2025-08-25",
+        "seedsRequired": 400,
+        "achieved": 390,
+        "status": "Completed"
+      },
+      {
+        "batchID": "B004",
+        "sowingDate": "2025-08-17",
+        "plantingDate": "2025-08-27",
+        "seedsRequired": 400,
+        "achieved": 390,
+        "status": "Completed"
+      }
+    ]
+  },
+  {
+    "crop": "Cabbage",
+    "partitions": "C3",
+    "sowingDate": "2025-09-20",
+    "plantingDate": "2025-09-30",
+    "seedsRequired": 1200,
+    "achieved": 0,
+    "status": "Pending",
+    "batches": [
+      {
+        "batchID": "B005",
+        "sowingDate": "2025-09-20",
+        "plantingDate": "2025-09-30",
+        "seedsRequired": 600,
+        "achieved": 0,
+        "status": "Pending"
+      },
+      {
+        "batchID": "B006",
+        "sowingDate": "2025-09-22",
+        "plantingDate": "2025-10-02",
+        "seedsRequired": 600,
+        "achieved": 0,
+        "status": "Pending"
+      }
+    ]
+  },
+  {
+    "crop": "Carrots",
+    "partitions": "D4",
+    "sowingDate": "2025-07-20",
+    "plantingDate": "2025-07-30",
+    "seedsRequired": 900,
+    "achieved": 850,
+    "status": "Completed",
+    "batches": [
+      {
+        "batchID": "B007",
+        "sowingDate": "2025-07-20",
+        "plantingDate": "2025-07-30",
+        "seedsRequired": 450,
+        "achieved": 420,
+        "status": "Completed"
+      },
+      {
+        "batchID": "B008",
+        "sowingDate": "2025-07-22",
+        "plantingDate": "2025-08-01",
+        "seedsRequired": 450,
+        "achieved": 430,
+        "status": "Completed"
+      }
+    ]
+  },
+  {
+    "crop": "Lettuce",
+    "partitions": "E5",
+    "sowingDate": "2025-09-12",
+    "plantingDate": "2025-09-20",
+    "seedsRequired": 600,
+    "achieved": 300,
+    "status": "Ongoing",
+    "batches": [
+      {
+        "batchID": "B009",
+        "sowingDate": "2025-09-12",
+        "plantingDate": "2025-09-20",
+        "seedsRequired": 300,
+        "achieved": 150,
+        "status": "Ongoing"
+      },
+      {
+        "batchID": "B010",
+        "sowingDate": "2025-09-13",
+        "plantingDate": "2025-09-22",
+        "seedsRequired": 300,
+        "achieved": 150,
+        "status": "Ongoing"
+      }
+    ]
+  },
+  {
+    "crop": "Kale",
+    "partitions": "F6",
+    "sowingDate": "2025-10-05",
+    "plantingDate": "2025-10-15",
+    "seedsRequired": 700,
+    "achieved": 0,
+    "status": "Pending",
+    "batches": [
+      {
+        "batchID": "B011",
+        "sowingDate": "2025-10-05",
+        "plantingDate": "2025-10-15",
+        "seedsRequired": 350,
+        "achieved": 0,
+        "status": "Pending"
+      },
+      {
+        "batchID": "B012",
+        "sowingDate": "2025-10-07",
+        "plantingDate": "2025-10-17",
+        "seedsRequired": 350,
+        "achieved": 0,
+        "status": "Pending"
+      }
+    ]
+  },
+  {
+    "crop": "Onions",
+    "partitions": "G7",
+    "sowingDate": "2025-08-28",
+    "plantingDate": "2025-09-05",
+    "seedsRequired": 950,
+    "achieved": 600,
+    "status": "Ongoing",
+    "batches": [
+      {
+        "batchID": "B013",
+        "sowingDate": "2025-08-28",
+        "plantingDate": "2025-09-05",
+        "seedsRequired": 475,
+        "achieved": 300,
+        "status": "Ongoing"
+      },
+      {
+        "batchID": "B014",
+        "sowingDate": "2025-08-30",
+        "plantingDate": "2025-09-07",
+        "seedsRequired": 475,
+        "achieved": 300,
+        "status": "Ongoing"
+      }
+    ]
+  },
+  {
+    "crop": "Peppers",
+    "partitions": "H8",
+    "sowingDate": "2025-07-10",
+    "plantingDate": "2025-07-20",
+    "seedsRequired": 1100,
+    "achieved": 1050,
+    "status": "Completed",
+    "batches": [
+      {
+        "batchID": "B015",
+        "sowingDate": "2025-07-10",
+        "plantingDate": "2025-07-20",
+        "seedsRequired": 550,
+        "achieved": 530,
+        "status": "Completed"
+      },
+      {
+        "batchID": "B016",
+        "sowingDate": "2025-07-12",
+        "plantingDate": "2025-07-22",
+        "seedsRequired": 550,
+        "achieved": 520,
+        "status": "Completed"
+      }
+    ]
+  }
+]

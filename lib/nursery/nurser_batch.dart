@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:nursery_app/nursery/nursery.dart'; // adjust path
+import 'package:nursery_app/nursery/nursery.dart';
+
+import '../model/crop_model.dart'; // adjust path
 
 // Dummy Nursery Activity Model
 class NurseryActivity {
@@ -17,7 +19,7 @@ class NurseryActivity {
 }
 
 class NurseryBatchDialog extends StatefulWidget {
-  final CropData crop;
+  final cropDetails crop;
 
   const NurseryBatchDialog({super.key, required this.crop});
 
@@ -317,7 +319,7 @@ class _NurseryBatchDialogState extends State<NurseryBatchDialog> {
 
   //subwigets
 
-  Widget CropInfoTable(CropData crop, int deficit) {
+  Widget CropInfoTable(cropDetails crop, int deficit) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: SingleChildScrollView(
