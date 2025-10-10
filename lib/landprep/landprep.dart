@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nursery_app/constant/color.dart';
 import 'package:nursery_app/nursery/crop_detail.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -6,6 +9,42 @@ import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:intl/intl.dart';
 
 import 'landQeustionaire.dart';
+
+class Landprep {
+  final String crop;
+  final String partitions;
+  final String plantingweek;
+  final String plantingDate;
+  final String status;
+
+  Landprep({
+    required this.crop,
+    required this.partitions,
+    required this.plantingweek,
+    required this.plantingDate,
+    required this.status,
+  });
+
+  factory Landprep.fromJson(Map<String, dynamic> json) {
+    return Landprep(
+      crop: json['crop'],
+      partitions: json['partitions'],
+      plantingweek: json['plantingweek'],
+      plantingDate: json['plantingDate'],
+      status: json['status'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'crop': crop,
+
+    'partitions': partitions,
+    'plantingweek': plantingweek,
+    'plantingDate': plantingDate,
+    'status': status,
+  };
+}
+
 
 class LandPrepPage extends StatefulWidget {
   const LandPrepPage({super.key});
@@ -17,6 +56,8 @@ class LandPrepPage extends StatefulWidget {
 class _LandPrepPageState extends State<LandPrepPage> {
   String searchQuery="";
   String? landfilter;
+  List<Landprep> _land = [];
+  bool _loading = true;
 
 
   String? partitionFilter;
@@ -27,6 +68,22 @@ class _LandPrepPageState extends State<LandPrepPage> {
   DateTime? plantingToDate;
 
   final DateFormat formatter = DateFormat("dd/MM/yyyy");
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLandData();
+  }
+
+  Future<void> _loadLandData() async {
+    final String response = await rootBundle.loadString('assets/landprep.json');
+    final List<dynamic> data = json.decode(response);
+
+    setState(() {
+      _land = data.map((e) => Landprep.fromJson(e)).toList();
+      _loading = false;
+    });
+  }
 
   List<Landprep> get filteredCrops {
     return _land.where((crop) {
@@ -131,7 +188,7 @@ class _LandPrepPageState extends State<LandPrepPage> {
         children: [
           buildSearchAndFilterBar(context),
           SizedBox(height: 20.0,),
-          _dashboardTable(context)
+          Expanded(child: _dashboardTable(context, filteredCrops)),
         ],
 
       ),
@@ -395,7 +452,7 @@ class _LandPrepPageState extends State<LandPrepPage> {
 
 
 
-Widget _dashboardTable(BuildContext context) {
+Widget _dashboardTable(BuildContext context,List<Landprep> data) {
   // 👇 Responsive font sizes
   final screenWidth = MediaQuery.of(context).size.width;
   final double headingFontSize = screenWidth < 1000 ? 10 : 12;
@@ -448,34 +505,25 @@ Widget _dashboardTable(BuildContext context) {
             DataColumn(label: SizedBox(width: actionColWidth, child: Text("#"))),
           ],
 
-          rows: _land.map((land) {
+          rows: data.map((land) {
             return DataRow(
               cells: [
-                DataCell(SizedBox(width: colWidth, child: Text(land.partitions))),
-                DataCell(SizedBox(width: colWidth, child: Text(land.crop))),
-                DataCell(SizedBox(width: colWidth, child: Text(land.plantingDate))),
-                DataCell(SizedBox(width: colWidth, child: Text(land.plantingweek.toString()))),
-
-                DataCell(SizedBox(width: colWidth, child: Text(land.status))),
-
+                DataCell(Text(land.partitions)),
+                DataCell(Text(land.crop)),
+                DataCell(Text(land.plantingDate)),
+                DataCell(Text(land.plantingweek)),
+                DataCell(Text(land.status)),
                 DataCell(
-                  SizedBox(
-                    width: actionColWidth,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                            builder: (context) =>
-                                LandPreparationPage(),
-                        ),
-                        );
-                      },
-                      child: const Text("Open"),
-                    ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LandPreparationPage()),
+                      );
+                    },
+                    child: const Text("Open"),
                   ),
                 ),
-
               ],
             );
           }).toList(),
@@ -490,23 +538,7 @@ Widget _dashboardTable(BuildContext context) {
 
 
 // 🔹 Example crops dataset (keep it outside the widget function)
-final List<Landprep> _land = [
-  Landprep("Blcok A Valve 6", 'Maize', "27 Oct 2025", 14, "Pending"),
-];
+
 
 // 🔹 Data class
-class Landprep {
-  final String partitions;
-  final String crop;
-  final String plantingDate;
-  final int plantingweek;
-  final String status;
 
-  Landprep(
-      this.partitions,
-      this.crop,
-      this.plantingDate,
-      this.plantingweek,
-      this.status,
-      );
-}

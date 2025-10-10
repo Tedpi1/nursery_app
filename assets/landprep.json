@@ -1,0 +1,23 @@
+[
+  {
+    "crop": "Tomatoes",
+    "partitions": "Partition A",
+    "plantingweek": "Week 35-2025",
+    "plantingDate": "01/09/2025",
+    "status": "Ongoing"
+  },
+  {
+    "crop": "Cabbage",
+    "partitions": "Partition B",
+    "plantingweek": "Week 34-2025",
+    "plantingDate": "25/08/2025",
+    "status": "Completed"
+  },
+  {
+    "crop": "Onions",
+    "partitions": "Partition C",
+    "plantingweek": "Week 36-2025",
+    "plantingDate": "08/09/2025",
+    "status": "Pending"
+  }
+]
